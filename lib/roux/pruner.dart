@@ -64,6 +64,47 @@ class RouxPruner {
     );
   }
 
+  factory RouxPruner.cmll() {
+    return RouxPruner(
+      size: 648,
+      maxDepth: 11,
+      encode: _encodeCmll,
+      moveset: const ['U', "U'", 'U2', 'R', "R'", 'R2', 'F', "F'", 'F2'],
+      solvedStates: [RouxCube.solved()],
+      name: 'cmll',
+    );
+  }
+
+  factory RouxPruner.sbCorner() {
+    return RouxPruner(
+      size: 576,
+      maxDepth: 10,
+      encode: _encodeSbCorner,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'sb-corner',
+    );
+  }
+
+  factory RouxPruner.sbEdgeA() {
+    return RouxPruner(
+      size: 13824,
+      maxDepth: 10,
+      encode: _encodeSbEdgeA,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'sb-edge-a',
+    );
+  }
+
   factory RouxPruner.eolr({int centerFlag = 0x11, String? barbieMode}) {
     final preMoves = _eolrPreMoves(centerFlag, barbieMode);
     return RouxPruner(
@@ -112,6 +153,25 @@ class RouxPruner {
     final distance = _distance![encode(cube)];
     if (distance == 255) return maxDepth + 1;
     return distance;
+  }
+
+  static int _lehmer4(int a, int b, int c, int d) {
+    var code = 0;
+    final digits = [a, b, c, d];
+    for (var i = 0; i < 3; i++) {
+      var inversions = 0;
+      for (var j = i + 1; j < 4; j++) {
+        if (digits[j] < digits[i]) inversions++;
+      }
+      code = code * (4 - i) + inversions;
+    }
+    return code;
+  }
+
+  static int _encodeCmll(RouxCube cube) {
+    final permIdx = _lehmer4(cube.cp[0], cube.cp[1], cube.cp[2], cube.cp[3]);
+    final oriIdx = cube.co[0] * 9 + cube.co[1] * 3 + cube.co[2];
+    return permIdx * 27 + oriIdx;
   }
 
   static int _encodeFbCorner(RouxCube cube) {
