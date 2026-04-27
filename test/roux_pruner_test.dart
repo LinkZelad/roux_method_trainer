@@ -34,4 +34,24 @@ void main() {
     expect(pruner.query(RouxCube.solved().applyAlg("M U M2")), 0);
     expect(pruner.query(RouxCube.solved()), greaterThanOrEqualTo(0));
   });
+
+  test('FB corner pruner gives distance 0 for solved state', () {
+    final pruner = RouxPruner.fbCorner()..init();
+    expect(pruner.query(RouxCube.solved()), 0);
+  });
+
+  test('FB corner pruner gives distance 1 for single-move scramble', () {
+    final pruner = RouxPruner.fbCorner()..init();
+    expect(pruner.query(RouxCube.solved().applyAlg('R')), lessThanOrEqualTo(1));
+  });
+
+  test('FB edge pruner gives distance 0 for solved state', () {
+    final pruner = RouxPruner.fbEdge()..init();
+    expect(pruner.query(RouxCube.solved()), 0);
+  });
+
+  test('FB edge pruner gives distance 1 for single-move scramble', () {
+    final pruner = RouxPruner.fbEdge()..init();
+    expect(pruner.query(RouxCube.solved().applyAlg('L')), lessThanOrEqualTo(1));
+  });
 }

@@ -34,6 +34,36 @@ class RouxPruner {
     );
   }
 
+  factory RouxPruner.fbCorner() {
+    return RouxPruner(
+      size: 576,
+      maxDepth: 10,
+      encode: _encodeFbCorner,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'fb-corner',
+    );
+  }
+
+  factory RouxPruner.fbEdge() {
+    return RouxPruner(
+      size: 13824,
+      maxDepth: 10,
+      encode: _encodeFbEdge,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'fb-edge',
+    );
+  }
+
   factory RouxPruner.eolr({int centerFlag = 0x11, String? barbieMode}) {
     final preMoves = _eolrPreMoves(centerFlag, barbieMode);
     return RouxPruner(
@@ -82,6 +112,23 @@ class RouxPruner {
     final distance = _distance![encode(cube)];
     if (distance == 255) return maxDepth + 1;
     return distance;
+  }
+
+  static int _encodeFbCorner(RouxCube cube) {
+    final pos4 = cube.cp.indexOf(4);
+    final pos5 = cube.cp.indexOf(5);
+    return pos4 * 72 + cube.co[pos4] * 24 + pos5 * 3 + cube.co[pos5];
+  }
+
+  static int _encodeFbEdge(RouxCube cube) {
+    final pos5 = cube.ep.indexOf(5);
+    final pos8 = cube.ep.indexOf(8);
+    final pos9 = cube.ep.indexOf(9);
+    return pos5 * 1152 + cube.eo[pos5] * 576 +
+        pos8 * 48 +
+        cube.eo[pos8] * 24 +
+        pos9 * 2 +
+        cube.eo[pos9];
   }
 
   static int _encodeLse(RouxCube cube) {
