@@ -40,6 +40,20 @@ class RouxSolver {
     );
   }
 
+  factory RouxSolver.fb() {
+    final fbCorner = RouxPruner.fbCorner();
+    final fbEdge = RouxPruner.fbEdge();
+    return RouxSolver(
+      isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.fb),
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      pruners: [fbCorner, fbEdge],
+    );
+  }
+
   factory RouxSolver.exact() {
     return RouxSolver(
       isSolved: (cube) => cube.isSolved,

@@ -222,6 +222,19 @@ class RouxCubeUtil {
     );
   }
 
+  static RouxCube getRandomFb({Random? random}) {
+    random ??= Random();
+    const fbScramble = RouxCubeMask(
+      cp: [1, 1, 1, 1, 0, 0, 1, 1],
+      ep: [1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1],
+      tp: [1, 1, 1, 1, 0, 0],
+    );
+    while (true) {
+      final cube = getRandomWithMask(fbScramble, random: random);
+      if (!isSolved(cube, RouxCubeMask.fb)) return cube;
+    }
+  }
+
   static RouxCube getRandomLse({Random? random}) {
     random ??= Random();
     final cube = getRandomWithMask(RouxCubeMask.lse, random: random);

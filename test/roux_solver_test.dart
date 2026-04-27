@@ -68,4 +68,22 @@ void main() {
     expect(scramble, isNotNull);
     expect(RouxCube.solved().apply(scramble!), cube);
   });
+
+  test('FB solver solves a known short FB scramble', () {
+    final solver = RouxSolver.fb();
+    // Apply a short scramble that affects FB pieces, then solve it.
+    final cube = RouxCube.solved().applyAlg("R U R'");
+    final solutions = solver.solve(cube, minDepth: 0, maxDepth: 5, capacity: 1);
+    expect(solutions, hasLength(1));
+    final solved = cube.apply(solutions.first);
+    expect(RouxCubeUtil.isSolved(solved, RouxCubeMask.fb), isTrue);
+  });
+
+  test('FB random state is not already solved', () {
+    final random = Random(99);
+    for (var i = 0; i < 10; i++) {
+      final cube = RouxCubeUtil.getRandomFb(random: random);
+      expect(RouxCubeUtil.isSolved(cube, RouxCubeMask.fb), isFalse);
+    }
+  });
 }
