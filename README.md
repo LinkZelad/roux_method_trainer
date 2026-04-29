@@ -2,7 +2,7 @@
 
 A comprehensive Flutter-based training application for the Roux Method of solving the Rubik's Cube. This app provides advanced tools for both beginners and experts to master Block Building, CMLL, and LSE.
 
-![3D Cube Demo](screenshot_timer.png) *(Note: Add your actual screenshots here)*
+![3D Cube Demo](screenshot_timer.png)
 
 ## 🚀 Key Features
 
@@ -11,9 +11,10 @@ A comprehensive Flutter-based training application for the Roux Method of solvin
 - **Dynamic Lighting**: Real-time shading and depth sorting for a professional 3D look.
 - **Gesture Control**: Intuitive touch-based rotation to view the cube from any angle.
 
-### 🎓 Training Modes
-- **Teaching Mode**: Interactive CMLL algorithm browser with step-by-step 3D playback.
-- **Practice Trainer**: Specialized scrambles for Roux sub-steps:
+### 🎓 Teaching & Training
+- **Teaching Mode (New)**: Guided learning for First Block (FB), Second Block (SB), and CMLL. Includes curated scenarios for common block-building challenges.
+- **Full Roux Solve Demo (New)**: Watch a complete end-to-end Roux solve (FB -> SB -> CMLL -> LSE) to understand the global flow and efficient transitions.
+- **Practice Trainer**: Specialized scrambles and **optimal solution analysis** for Roux sub-steps:
     - First Block (FB) & First Square (FS)
     - Second Block (SB)
     - CMLL (Random & Category-based)
@@ -21,15 +22,16 @@ A comprehensive Flutter-based training application for the Roux Method of solvin
 - **Demo Mode**: Detailed algorithm playback with visual move indicators and playback controls.
 
 ### ⏱️ Performance Tracking
-- **Smart Timer**: Specialized timer that tracks Roux-specific splits.
+- **Smart Timer**: Specialized timer that tracks Roux-specific modes.
+- **Weakness Analysis (New)**: Aggregated statistics that identify which specific CMLL cases or Roux steps are your slowest, helping you focus your practice.
 - **Detailed History**: Keep track of your solves and monitor progress over time.
 - **Reference Library**: Quick access to CMLL and LSE (EO, LR, 4C) algorithm sheets.
 
 ## 🛠️ Technical Implementation
 - **Custom 3D Engine**: Built using Flutter `CustomPainter` and `vector_math` for efficient 3D projection without external heavy dependencies.
+- **Advanced Solver**: Integrated mathematical solver that provides the shortest optimal path for FB/SB steps during practice.
+- **Isolate-based Scrambling**: Heavy scramble generation and solving logic is offloaded to background isolates to ensure zero UI lag.
 - **State Management**: Uses `Provider` for clean state separation and efficient UI updates.
-- **Isolate-based Scrambling**: Heavy scramble generation logic is offloaded to background isolates to ensure zero UI lag.
-- **Localization Support**: Built-in infrastructure for multi-language support.
 
 ## 📦 Getting Started
 
@@ -57,7 +59,7 @@ A comprehensive Flutter-based training application for the Roux Method of solvin
    ```
 
 ## 📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ---
 *Created by [LinkZelad](https://github.com/LinkZelad)*
