@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/timer_provider.dart';
 import '../models/solve_record.dart';
+import '../l10n/app_localizations.dart';
+import '../widgets/cube_net.dart';
+import '../widgets/cube_net_highlight.dart';
 
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
@@ -91,6 +94,7 @@ class _TimerScreenState extends State<TimerScreen> {
       builder: (context, timer, child) {
         final isRunning = timer.state == TimerState.running;
         final isStopped = timer.state == TimerState.stopped;
+        final l10n = AppLocalizations(timer.settings.locale);
 
         return Container(
           color: Colors.black,
@@ -99,10 +103,56 @@ class _TimerScreenState extends State<TimerScreen> {
               children: [
                 // 顶部信息栏（计时中隐藏）
                 if (!isRunning) _buildTopBar(context, timer),
-                // 打乱显示（计时中隐藏）
-                if (!isRunning) _buildScrambleDisplay(timer),
-                // 统计栏（计时中隐藏）
-                if (!isRunning) _buildStatsBar(timer),
+                // 打乱显示 + 统计栏（计时中隐藏）
+                if (!isRunning)
+                  Flexible(
+                    flex: 2,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Scramble text - compact
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 2),
+                              child: Text(
+                                timer.scramble,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: timer.isGeneratingScramble
+                                      ? Colors.white38
+                                      : Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                            // Cube net - auto-scales to fit remaining space
+                            if (!timer.isGeneratingScramble &&
+                                timer.scramble != 'Generating scramble...' &&
+                                timer.scramble.isNotEmpty)
+                              Expanded(
+                                child: Center(
+                                  child: CubeNet.fromScramble(
+                                    timer.scramble,
+                                    colorScheme: timer.settings.colorScheme,
+                                    highlightMask: highlightMaskForMode(
+                                      timer.mode,
+                                    ),
+                                    stickerSize: 26,
+                                  ),
+                                ),
+                              ),
+                            // Stats bar - compact
+                            _buildStatsBar(timer),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 // 计时器主显示 - 触摸区域
                 Expanded(
                   child: Listener(
@@ -143,11 +193,11 @@ class _TimerScreenState extends State<TimerScreen> {
                                 ),
                               ),
                               if (timer.state == TimerState.ready)
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 12),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12),
                                   child: Text(
-                                    'Release to start',
-                                    style: TextStyle(
+                                    l10n['releaseToStart'],
+                                    style: const TextStyle(
                                       color: Colors.green,
                                       fontSize: 18,
                                     ),
@@ -158,8 +208,8 @@ class _TimerScreenState extends State<TimerScreen> {
                                   padding: const EdgeInsets.only(top: 12),
                                   child: Text(
                                     timer.settings.holdToStart
-                                        ? 'Hold to start'
-                                        : 'Tap to start',
+                                        ? l10n['holdToStart']
+                                        : l10n['tapToStart'],
                                     style: const TextStyle(
                                       color: Colors.white38,
                                       fontSize: 16,
@@ -179,7 +229,7 @@ class _TimerScreenState extends State<TimerScreen> {
                 if (isStopped) _buildPenaltyBar(context, timer),
                 if (isStopped && timer.currentCaseAlg != null)
                   _buildSolutionDisplay(timer),
-                if (!isRunning && !isStopped) const SizedBox(height: 24),
+
               ],
             ),
           ),
@@ -189,27 +239,7 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   Widget _buildTopBar(BuildContext context, TimerProvider timer) {
-    String modeText;
-    switch (timer.mode) {
-      case TrainingMode.standard:
-        modeText = 'Standard';
-        break;
-      case TrainingMode.cmll:
-        modeText = 'CMLL';
-        break;
-      case TrainingMode.fb:
-        modeText = 'First Block';
-        break;
-      case TrainingMode.sb:
-        modeText = 'Second Block';
-        break;
-      case TrainingMode.lseEOLR:
-        modeText = 'EOLR';
-        break;
-      case TrainingMode.lse4C:
-        modeText = '4C';
-        break;
-    }
+    final modeText = localizedModeLabel(timer.mode, timer.settings.locale);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -245,37 +275,24 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 
-  Widget _buildScrambleDisplay(TimerProvider timer) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Text(
-        timer.scramble,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-          height: 1.5,
-        ),
-      ),
-    );
-  }
+  // Scramble display is now inlined in the main build for better layout control.
 
   Widget _buildStatsBar(TimerProvider timer) {
     final records = timer.records;
     final avg5 = StatsCalculator.calculateTrimmedAverage(records, 5);
     final avg12 = StatsCalculator.calculateTrimmedAverage(records, 12);
     final best = StatsCalculator.calculateBest(records);
+    final l10n = AppLocalizations(timer.settings.locale);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _statItem('AO5', StatsCalculator.formatDuration(avg5)),
-          _statItem('AO12', StatsCalculator.formatDuration(avg12)),
-          _statItem('Best', StatsCalculator.formatDuration(best)),
-          _statItem('Count', '${records.length}'),
+          _statItem(l10n['ao5'], StatsCalculator.formatDuration(avg5)),
+          _statItem(l10n['ao12'], StatsCalculator.formatDuration(avg12)),
+          _statItem(l10n['best'], StatsCalculator.formatDuration(best)),
+          _statItem(l10n['count'], '${records.length}'),
         ],
       ),
     );
@@ -304,11 +321,11 @@ class _TimerScreenState extends State<TimerScreen> {
   Widget _buildSessionSolves(TimerProvider timer) {
     final records = timer.records.take(12).toList();
     if (records.isEmpty) {
-      return const SizedBox(height: 120);
+      return const SizedBox(height: 60);
     }
 
     return Container(
-      height: 120,
+      height: 80,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.builder(
         reverse: true,
@@ -375,9 +392,9 @@ class _TimerScreenState extends State<TimerScreen> {
       ),
       child: Column(
         children: [
-          const Text(
-            'SOLUTION',
-            style: TextStyle(
+          Text(
+            AppLocalizations(timer.settings.locale)['solution'],
+            style: const TextStyle(
               color: Colors.orange,
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -400,31 +417,32 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   Widget _buildPenaltyBar(BuildContext context, TimerProvider timer) {
+    final l10n = AppLocalizations(timer.settings.locale);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _penaltyButton(
-            'OK',
+            l10n['ok'],
             timer.currentPenalty == Penalty.none
                 ? Colors.green
                 : Colors.white24,
             () => timer.setPenalty(Penalty.none),
           ),
           _penaltyButton(
-            '+2',
+            l10n['penaltyPlus2'],
             timer.currentPenalty == Penalty.plus2
                 ? Colors.orange
                 : Colors.white24,
             () => timer.setPenalty(Penalty.plus2),
           ),
           _penaltyButton(
-            'DNF',
+            l10n['penaltyDNF'],
             timer.currentPenalty == Penalty.dnf ? Colors.red : Colors.white24,
             () => timer.setPenalty(Penalty.dnf),
           ),
-          _penaltyButton('Next', Colors.blue, () => timer.saveSolve()),
+          _penaltyButton(l10n['next'], Colors.blue, () => timer.saveSolve()),
         ],
       ),
     );

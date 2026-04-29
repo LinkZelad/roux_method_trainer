@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../models/cmll_algs.dart';
+import '../providers/timer_provider.dart';
+import '../roux/cube.dart';
+import '../l10n/app_localizations.dart';
+import '../widgets/cube_net_highlight.dart';
+import '../widgets/cube_top_view.dart';
 
 class CmllReferenceScreen extends StatelessWidget {
   const CmllReferenceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations(context.watch<TimerProvider>().settings.locale);
     final categories = getCmllCategories();
+    final colorScheme = context.watch<TimerProvider>().settings.colorScheme;
 
     return DefaultTabController(
       length: categories.length,
@@ -16,9 +24,9 @@ class CmllReferenceScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.black,
           elevation: 0,
-          title: const Text(
-            'CMLL Reference',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            l10n['cmllReference'],
+            style: const TextStyle(color: Colors.white),
           ),
           bottom: TabBar(
             isScrollable: true,
@@ -36,6 +44,9 @@ class CmllReferenceScreen extends StatelessWidget {
               itemCount: cases.length,
               itemBuilder: (context, index) {
                 final case_ = cases[index];
+                // Generate the cube state for this case
+                final scramble = RouxMoveSeq.parse(case_.alg).inverse().toString();
+                final caseCube = RouxCube.solved().applyAlg(scramble);
                 return Card(
                   color: Colors.grey[900],
                   margin: const EdgeInsets.only(bottom: 12),
@@ -76,6 +87,16 @@ class CmllReferenceScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 12),
+                        // Top-down 2D cube view for CMLL recognition
+                        Center(
+                          child: CubeTopView.fromCube(
+                            caseCube,
+                            colorScheme: colorScheme,
+                            stickerSize: 28,
+                            highlightMask: cmllHighlightMask(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
@@ -100,9 +121,9 @@ class CmllReferenceScreen extends StatelessWidget {
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: case_.alg));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Algorithm copied'),
-                                  duration: Duration(seconds: 1),
+                                SnackBar(
+                                  content: Text(l10n['algorithmCopied']),
+                                  duration: const Duration(seconds: 1),
                                 ),
                               );
                             },
@@ -111,9 +132,9 @@ class CmllReferenceScreen extends StatelessWidget {
                               size: 16,
                               color: Colors.white54,
                             ),
-                            label: const Text(
-                              'Copy',
-                              style: TextStyle(
+                            label: Text(
+                              l10n['copy'],
+                              style: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 12,
                               ),

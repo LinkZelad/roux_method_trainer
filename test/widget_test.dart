@@ -25,6 +25,11 @@ void main() {
 
       await tester.tap(find.text('Training'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('First Block (FB)'),
+        200,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.text('First Block (FB)'));
       await tester.pumpAndSettle();
 

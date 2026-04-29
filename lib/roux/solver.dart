@@ -54,6 +54,62 @@ class RouxSolver {
     );
   }
 
+  factory RouxSolver.sb() {
+    final sbCorner = RouxPruner.sbCorner();
+    final sbEdgeA = RouxPruner.sbEdgeA();
+    final sbEdgeB = RouxPruner.sbEdgeB();
+    return RouxSolver(
+      isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.sb),
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      pruners: [sbCorner, sbEdgeA, sbEdgeB],
+      maxStateCount: 100000,
+    );
+  }
+
+  factory RouxSolver.cmll() {
+    final cmll = RouxPruner.cmll();
+    return RouxSolver(
+      isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.cmll),
+      moveset: const ['U', "U'", 'U2', 'R', "R'", 'R2', 'F', "F'", 'F2'],
+      pruners: [cmll],
+    );
+  }
+
+  factory RouxSolver.fbdr() {
+    final fbCorner = RouxPruner.fbCorner();
+    final fbEdge = RouxPruner.fbEdge();
+    final drEdge = RouxPruner.drEdge();
+    return RouxSolver(
+      isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.fbdr),
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      pruners: [fbCorner, fbEdge, drEdge],
+      maxStateCount: 100000,
+    );
+  }
+
+  factory RouxSolver.fs() {
+    final fsCorner = RouxPruner.fsCorner();
+    final fsEdge = RouxPruner.fsEdge();
+    return RouxSolver(
+      isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.fs),
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      pruners: [fsCorner, fsEdge],
+      maxStateCount: 100000,
+    );
+  }
+
   factory RouxSolver.exact() {
     return RouxSolver(
       isSolved: (cube) => cube.isSolved,

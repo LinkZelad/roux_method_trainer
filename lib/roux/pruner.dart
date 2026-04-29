@@ -75,6 +75,51 @@ class RouxPruner {
     );
   }
 
+  factory RouxPruner.drEdge() {
+    return RouxPruner(
+      size: 24,
+      maxDepth: 10,
+      encode: _encodeDrEdge,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'dr-edge',
+    );
+  }
+
+  factory RouxPruner.fsCorner() {
+    return RouxPruner(
+      size: 24,
+      maxDepth: 10,
+      encode: _encodeFsCorner,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'fs-corner',
+    );
+  }
+
+  factory RouxPruner.fsEdge() {
+    return RouxPruner(
+      size: 576,
+      maxDepth: 10,
+      encode: _encodeFsEdge,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'fs-edge',
+    );
+  }
+
   factory RouxPruner.sbCorner() {
     return RouxPruner(
       size: 576,
@@ -102,6 +147,21 @@ class RouxPruner {
       ],
       solvedStates: [RouxCube.solved()],
       name: 'sb-edge-a',
+    );
+  }
+
+  factory RouxPruner.sbEdgeB() {
+    return RouxPruner(
+      size: 13824,
+      maxDepth: 10,
+      encode: _encodeSbEdgeB,
+      moveset: const [
+        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
+        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
+        'M', "M'", 'M2',
+      ],
+      solvedStates: [RouxCube.solved()],
+      name: 'sb-edge-b',
     );
   }
 
@@ -191,6 +251,34 @@ class RouxPruner {
         cube.eo[pos9];
   }
 
+  static int _encodeSbCorner(RouxCube cube) {
+    final pos6 = cube.cp.indexOf(6);
+    final pos7 = cube.cp.indexOf(7);
+    return pos6 * 72 + cube.co[pos6] * 24 + pos7 * 3 + cube.co[pos7];
+  }
+
+  static int _encodeSbEdgeA(RouxCube cube) {
+    final pos7 = cube.ep.indexOf(7);
+    final pos10 = cube.ep.indexOf(10);
+    final pos11 = cube.ep.indexOf(11);
+    return pos7 * 1152 + cube.eo[pos7] * 576 +
+        pos10 * 48 +
+        cube.eo[pos10] * 24 +
+        pos11 * 2 +
+        cube.eo[pos11];
+  }
+
+  static int _encodeSbEdgeB(RouxCube cube) {
+    final pos5 = cube.ep.indexOf(5);
+    final pos8 = cube.ep.indexOf(8);
+    final pos9 = cube.ep.indexOf(9);
+    return pos5 * 1152 + cube.eo[pos5] * 576 +
+        pos8 * 48 +
+        cube.eo[pos8] * 24 +
+        pos9 * 2 +
+        cube.eo[pos9];
+  }
+
   static int _encodeLse(RouxCube cube) {
     const edgeEncode = [0, 1, 2, 3, 4, -1, 5, -1, -1, -1, -1, -1];
     final enc = List.filled(6, 0);
@@ -207,6 +295,22 @@ class RouxPruner {
       edgeEnc = edgeEnc * 12 + enc[i];
     }
     return edgeEnc * 4 * 4 + cube.tp[0] * 4 + cube.cp[0];
+  }
+
+  static int _encodeDrEdge(RouxCube cube) {
+    final pos7 = cube.ep.indexOf(7);
+    return pos7 * 2 + cube.eo[pos7];
+  }
+
+  static int _encodeFsCorner(RouxCube cube) {
+    final pos4 = cube.cp.indexOf(4);
+    return pos4 * 3 + cube.co[pos4];
+  }
+
+  static int _encodeFsEdge(RouxCube cube) {
+    final pos5 = cube.ep.indexOf(5);
+    final pos8 = cube.ep.indexOf(8);
+    return pos5 * 48 + cube.eo[pos5] * 24 + pos8 * 2 + cube.eo[pos8];
   }
 
   static int _encodeEolr(RouxCube cube) {

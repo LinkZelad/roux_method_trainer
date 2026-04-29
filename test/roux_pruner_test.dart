@@ -74,4 +74,27 @@ void main() {
     expect(pruner.query(cube), greaterThanOrEqualTo(0));
     expect(pruner.query(cube), lessThanOrEqualTo(11));
   });
+
+  test('SB corner pruner gives distance 0 for solved state', () {
+    final pruner = RouxPruner.sbCorner()..init();
+    expect(pruner.query(RouxCube.solved()), 0);
+  });
+
+  test('SB edge A pruner gives distance 0 for solved state', () {
+    final pruner = RouxPruner.sbEdgeA()..init();
+    expect(pruner.query(RouxCube.solved()), 0);
+  });
+
+  test('SB edge B pruner gives distance 0 for solved state', () {
+    final pruner = RouxPruner.sbEdgeB()..init();
+    expect(pruner.query(RouxCube.solved()), 0);
+  });
+
+  test('SB edge B pruner tracks FB edges staying solved', () {
+    final pruner = RouxPruner.sbEdgeB()..init();
+    // Scramble that keeps FB solved but disturbs SB
+    final cube = RouxCube.solved().applyAlg("R U R'");
+    // FB should still be solved
+    expect(pruner.query(cube), 0);
+  });
 }

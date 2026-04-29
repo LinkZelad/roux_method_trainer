@@ -86,4 +86,74 @@ void main() {
       expect(RouxCubeUtil.isSolved(cube, RouxCubeMask.fb), isFalse);
     }
   });
+
+  test('SB solver solves a known short SB scramble', () {
+    final solver = RouxSolver.sb();
+    final cube = RouxCube.solved().applyAlg("R U R'");
+    final solutions = solver.solve(cube, minDepth: 0, maxDepth: 5, capacity: 1);
+    expect(solutions, hasLength(1));
+    final solved = cube.apply(solutions.first);
+    expect(RouxCubeUtil.isSolved(solved, RouxCubeMask.sb), isTrue);
+  });
+
+  test('SB random state is not already solved', () {
+    final random = Random(99);
+    for (var i = 0; i < 10; i++) {
+      final cube = RouxCubeUtil.getRandomSb(random: random);
+      expect(RouxCubeUtil.isSolved(cube, RouxCubeMask.sb), isFalse);
+    }
+  });
+
+  test('CMLL solver solves a known short CMLL scramble', () {
+    final solver = RouxSolver.cmll();
+    final cube = RouxCube.solved().applyAlg("R U R' U R U2 R'");
+    final solutions = solver.solve(cube, minDepth: 0, maxDepth: 8, capacity: 1);
+    expect(solutions, hasLength(1));
+    final solved = cube.apply(solutions.first);
+    expect(RouxCubeUtil.isSolved(solved, RouxCubeMask.cmll), isTrue);
+  });
+
+  test('CMLL random state is not already solved', () {
+    final random = Random(99);
+    for (var i = 0; i < 10; i++) {
+      final cube = RouxCubeUtil.getRandomCmll(random: random);
+      expect(RouxCubeUtil.isSolved(cube, RouxCubeMask.cmll), isFalse);
+    }
+  });
+
+  test('generates a solvable FB scramble', () {
+    final solver = RouxSolver.fb();
+    final scramble = solver.generateScramble(
+      randomState: (random) => RouxCubeUtil.getRandomFb(random: random),
+      random: Random(3),
+      maxDepth: 15,
+      maxAttempts: 30,
+    );
+    expect(scramble, isNotNull);
+    expect(scramble!.moves.length, lessThanOrEqualTo(15));
+  });
+
+  test('generates a solvable SB scramble', () {
+    final solver = RouxSolver.sb();
+    final scramble = solver.generateScramble(
+      randomState: (random) => RouxCubeUtil.getRandomSb(random: random),
+      random: Random(3),
+      maxDepth: 18,
+      maxAttempts: 30,
+    );
+    expect(scramble, isNotNull);
+    expect(scramble!.moves.length, lessThanOrEqualTo(18));
+  });
+
+  test('generates a solvable CMLL scramble', () {
+    final solver = RouxSolver.cmll();
+    final scramble = solver.generateScramble(
+      randomState: (random) => RouxCubeUtil.getRandomCmll(random: random),
+      random: Random(3),
+      maxDepth: 12,
+      maxAttempts: 30,
+    );
+    expect(scramble, isNotNull);
+    expect(scramble!.moves.length, lessThanOrEqualTo(12));
+  });
 }

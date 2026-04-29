@@ -177,6 +177,18 @@ class RouxCubeMask {
     eo: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     tp: [0, 0, 0, 0, 0, 0],
   );
+
+  static const fbdr = RouxCubeMask(
+    cp: [0, 0, 0, 0, 1, 1, 0, 0],
+    ep: [0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0],
+    tp: [0, 0, 0, 0, 1, 1],
+  );
+
+  static const fs = RouxCubeMask(
+    cp: [0, 0, 0, 0, 1, 0, 0, 0],
+    ep: [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+    tp: [0, 0, 0, 0, 0, 1],
+  );
 }
 
 class RouxCubeUtil {
@@ -235,6 +247,32 @@ class RouxCubeUtil {
     }
   }
 
+  static RouxCube getRandomSb({Random? random}) {
+    random ??= Random();
+    const sbScramble = RouxCubeMask(
+      cp: [1, 1, 1, 1, 1, 1, 0, 0],
+      ep: [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0],
+      tp: [1, 1, 1, 1, 1, 1],
+    );
+    while (true) {
+      final cube = getRandomWithMask(sbScramble, random: random);
+      if (!isSolved(cube, RouxCubeMask.sb)) return cube;
+    }
+  }
+
+  static RouxCube getRandomCmll({Random? random}) {
+    random ??= Random();
+    const cmllScramble = RouxCubeMask(
+      cp: [0, 0, 0, 0, 1, 1, 1, 1],
+      ep: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      tp: [1, 1, 1, 1, 1, 1],
+    );
+    while (true) {
+      final cube = getRandomWithMask(cmllScramble, random: random);
+      if (!isSolved(cube, RouxCubeMask.cmll)) return cube;
+    }
+  }
+
   static RouxCube getRandomLse({Random? random}) {
     random ??= Random();
     final cube = getRandomWithMask(RouxCubeMask.lse, random: random);
@@ -253,6 +291,32 @@ class RouxCubeUtil {
       RouxMoveSeq([RouxMove.all['M2']!]),
     ];
     return cube.apply(premoves[random.nextInt(premoves.length)]);
+  }
+
+  static RouxCube getRandomFbdr({Random? random}) {
+    random ??= Random();
+    const fbdrScramble = RouxCubeMask(
+      cp: [1, 1, 1, 1, 0, 0, 1, 1],
+      ep: [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1],
+      tp: [1, 1, 1, 1, 0, 0],
+    );
+    while (true) {
+      final cube = getRandomWithMask(fbdrScramble, random: random);
+      if (!isSolved(cube, RouxCubeMask.fbdr)) return cube;
+    }
+  }
+
+  static RouxCube getRandomFs({Random? random}) {
+    random ??= Random();
+    const fsScramble = RouxCubeMask(
+      cp: [1, 1, 1, 1, 0, 1, 1, 1],
+      ep: [1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1],
+      tp: [1, 1, 1, 1, 1, 0],
+    );
+    while (true) {
+      final cube = getRandomWithMask(fsScramble, random: random);
+      if (!isSolved(cube, RouxCubeMask.fs)) return cube;
+    }
   }
 
   static int parity(List<int> permutation) {

@@ -3,10 +3,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/app_settings.dart';
 import '../models/solve_record.dart';
-import '../models/scramble_generator.dart';
 import '../models/cmll_algs.dart';
-import '../roux/cube.dart';
-import '../roux/solver.dart';
+import '../roux/scramble_isolate.dart';
 import '../services/storage_service.dart';
 
 enum TimerState {
@@ -47,10 +45,12 @@ class TimerProvider extends ChangeNotifier {
   List<SolveRecord> get records => List.unmodifiable(_records);
   Penalty get currentPenalty => _currentPenalty;
   AppSettings get settings => _settings;
+  bool get isGeneratingScramble => _isGeneratingScramble;
+
+  bool _isGeneratingScramble = false;
+  bool _disposed = false;
 
   static final Random _rand = Random();
-  static final RouxSolver _lseSolver = RouxSolver.lse();
-  static final RouxSolver _eolrSolver = RouxSolver.eolr();
 
   TimerProvider() {
     _generateNewScramble();
@@ -106,88 +106,55 @@ class TimerProvider extends ChangeNotifier {
   }
 
   void _generateNewScramble() {
+    _isGeneratingScramble = true;
+    _scramble = 'Generating scramble...';
+    _currentCaseId = null;
+    _currentCaseName = null;
+    _currentCaseAlg = null;
+    notifyListeners();
+
     switch (_mode) {
-      case TrainingMode.standard:
-        _scramble = ScrambleGenerator.generateStandard(
-          length: _settings.standardScrambleLength,
-        );
-        _currentCaseId = null;
-        _currentCaseName = null;
-        _currentCaseAlg = null;
-        break;
       case TrainingMode.cmll:
-        final case_ =
-            _selectedCmllCase ??
-            getRandomCmllCase(categories: _selectedCmllCategories);
-        _currentCaseId = case_.id;
-        _currentCaseName = '${case_.category} ${case_.name}';
-        _currentCaseAlg = case_.alg;
-        // CMLL训练打乱：预打乱(模拟SB完成状态) + 随机AUF + case setup
-        final sbSetup = "R' U' R' U R U R U' R' U R U r'";
-        final auf = ['', 'U ', "U' ", 'U2 '][_rand.nextInt(4)];
-        // 使用case算法的逆作为setup，这样应用算法就能还原
-        _scramble = '$sbSetup $auf${_inverseAlg(case_.alg)}';
+        _generateCmllScrambleAsync();
         break;
+      case TrainingMode.standard:
       case TrainingMode.fb:
-        _scramble = ScrambleGenerator.generateRoux(
-          length: _settings.rouxScrambleLength,
-        );
-        _currentCaseId = null;
-        _currentCaseName = null;
-        _currentCaseAlg = null;
-        break;
       case TrainingMode.sb:
-        _scramble = ScrambleGenerator.generateRoux(
-          length: _settings.rouxScrambleLength,
-        );
-        _currentCaseId = null;
-        _currentCaseName = null;
-        _currentCaseAlg = null;
-        break;
       case TrainingMode.lseEOLR:
-        _scramble = _generateEolrScramble();
-        _currentCaseId = null;
-        _currentCaseName = null;
-        _currentCaseAlg = null;
-        break;
       case TrainingMode.lse4C:
-        _scramble = _generateLse4cScramble();
-        _currentCaseId = null;
-        _currentCaseName = null;
-        _currentCaseAlg = null;
+      case TrainingMode.fbdr:
+      case TrainingMode.fs:
+        final modeIndex = _mode.index;
+        final seed = _rand.nextInt(1 << 31);
+        compute(generateTimerScramble, IsolateTimerRequest(mode: modeIndex, seed: seed))
+            .then((scramble) {
+          if (!_disposed) {
+            _scramble = scramble;
+            _isGeneratingScramble = false;
+            notifyListeners();
+          }
+        });
         break;
     }
   }
 
-  String _generateEolrScramble() {
-    return _eolrSolver
-            .generateScramble(
-              randomState: (random) =>
-                  RouxCubeUtil.getRandomLse(random: random),
-              random: _rand,
-              maxDepth: 10,
-              maxAttempts: 30,
-            )
-            ?.toString() ??
-        'M2 U M2';
-  }
+  void _generateCmllScrambleAsync() {
+    final case_ =
+        _selectedCmllCase ??
+        getRandomCmllCase(categories: _selectedCmllCategories);
+    _currentCaseId = case_.id;
+    _currentCaseName = '${case_.category} ${case_.name}';
+    _currentCaseAlg = case_.alg;
 
-  String _generateLse4cScramble() {
-    return _lseSolver
-            .generateScramble(
-              randomState: (random) =>
-                  RouxCubeUtil.getRandomLse4c(random: random),
-              random: _rand,
-              maxDepth: 8,
-              maxAttempts: 30,
-            )
-            ?.toString() ??
-        'M2';
-  }
-
-  /// 计算算法的逆
-  String _inverseAlg(String alg) {
-    return RouxMoveSeq.parse(alg).inverse().toString();
+    final seed = _rand.nextInt(1 << 31);
+    compute(generateTimerScramble, IsolateTimerRequest(mode: TrainingMode.cmll.index, seed: seed))
+        .then((scramble) {
+      if (!_disposed) {
+        _scramble = scramble;
+        _isGeneratingScramble = false;
+        notifyListeners();
+      }
+    });
   }
 
   /// 准备开始（按住屏幕）
@@ -316,6 +283,7 @@ class TimerProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
     super.dispose();
   }

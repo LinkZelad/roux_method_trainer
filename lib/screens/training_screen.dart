@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/timer_provider.dart';
 import '../models/solve_record.dart';
 import '../models/cmll_algs.dart';
 import 'cmll_reference_screen.dart';
+import 'demo_screen.dart';
+import 'lse_reference_screen.dart';
+import 'practice_screen.dart';
+import 'teaching_screen.dart';
 
 class TrainingScreen extends StatelessWidget {
   final VoidCallback onModeSelected;
@@ -12,23 +17,150 @@ class TrainingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations(context.watch<TimerProvider>().settings.locale);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: const Text(
-          'Training Modes',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          l10n['trainingModes'],
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSection('Timer Modes', [
+          _buildSection(l10n['practiceMode'], [
+            Card(
+              color: Colors.grey[900],
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.indigo.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.lightbulb, color: Colors.indigo),
+                ),
+                title: Text(
+                  l10n['practiceTrainer'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: Text(
+                  l10n['practiceTrainerSubtitle'],
+                  style: const TextStyle(color: Colors.white54, fontSize: 13),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white54,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PracticeScreen(
+                        initialMode: TrainingMode.fb,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ]),
+          const SizedBox(height: 24),
+          _buildSection('Learn', [
+            Card(
+              color: Colors.grey[900],
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.menu_book, color: Colors.purple),
+                ),
+                title: const Text(
+                  'Teaching Mode',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Learn CMLL cases with 3D visualization',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white54,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TeachingScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Card(
+              color: Colors.grey[900],
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.view_in_ar, color: Colors.amber),
+                ),
+                title: const Text(
+                  'Demo Mode',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Step-by-step 3D algorithm playback',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white54,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DemoScreen(
+                        title: 'Example: FB Build',
+                        scramble: "R2 U R U' R' U' R' U R'",
+                        algorithm: "R U R' U' R' F R2 U' R' U' R U R' F'",
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ]),
+          const SizedBox(height: 24),
+          _buildSection(l10n['timerModes'], [
             _ModeCard(
-              title: 'Standard Roux',
-              subtitle: 'Full solve with standard scramble',
+              title: l10n['standardRoux'],
+              subtitle: l10n['standardRouxSubtitle'],
               icon: Icons.timer,
               color: Colors.blue,
               mode: TrainingMode.standard,
@@ -36,18 +168,34 @@ class TrainingScreen extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 24),
-          _buildSection('Block Building', [
+          _buildSection(l10n['blockBuilding'], [
             _ModeCard(
-              title: 'First Block (FB)',
-              subtitle: 'Practice FB recognition and execution',
+              title: l10n['firstSquareFs'],
+              subtitle: l10n['firstSquareSubtitle'],
+              icon: Icons.crop_square,
+              color: Colors.lightGreen,
+              mode: TrainingMode.fs,
+              onSelected: onModeSelected,
+            ),
+            _ModeCard(
+              title: l10n['firstBlockFb'],
+              subtitle: l10n['firstBlockSubtitle'],
               icon: Icons.view_column,
               color: Colors.green,
               mode: TrainingMode.fb,
               onSelected: onModeSelected,
             ),
             _ModeCard(
-              title: 'Second Block (SB)',
-              subtitle: 'Practice SB with partial solve',
+              title: l10n['fbdrTitle'],
+              subtitle: l10n['fbdrSubtitle'],
+              icon: Icons.view_column,
+              color: Colors.greenAccent,
+              mode: TrainingMode.fbdr,
+              onSelected: onModeSelected,
+            ),
+            _ModeCard(
+              title: l10n['secondBlockSb'],
+              subtitle: l10n['secondBlockSubtitle'],
               icon: Icons.view_column_outlined,
               color: Colors.teal,
               mode: TrainingMode.sb,
@@ -57,14 +205,14 @@ class TrainingScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _buildSection('CMLL', [
             _ModeCard(
-              title: 'CMLL Random',
-              subtitle: 'Random CMLL cases',
+              title: l10n['cmllRandom'],
+              subtitle: l10n['cmllRandomSubtitle'],
               icon: Icons.shuffle,
               color: Colors.orange,
               mode: TrainingMode.cmll,
               onSelected: onModeSelected,
             ),
-            _buildCmllCategoryCard(context, onModeSelected),
+            _buildCmllCategoryCard(context, onModeSelected, l10n.locale),
             ListTile(
               leading: Container(
                 width: 48,
@@ -75,16 +223,16 @@ class TrainingScreen extends StatelessWidget {
                 ),
                 child: const Icon(Icons.menu_book, color: Colors.orange),
               ),
-              title: const Text(
-                'CMLL Reference',
-                style: TextStyle(
+              title: Text(
+                l10n['cmllReference'],
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              subtitle: const Text(
-                'View all CMLL algorithms',
-                style: TextStyle(color: Colors.white54, fontSize: 13),
+              subtitle: Text(
+                l10n['cmllReferenceSubtitle'],
+                style: const TextStyle(color: Colors.white54, fontSize: 13),
               ),
               trailing: const Icon(Icons.chevron_right, color: Colors.white54),
               onTap: () {
@@ -96,12 +244,43 @@ class TrainingScreen extends StatelessWidget {
                 );
               },
             ),
+            ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.purple.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.linear_scale, color: Colors.purple),
+              ),
+              title: const Text(
+                'LSE Reference',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: const Text(
+                'EO / LR / 4C algorithms',
+                style: TextStyle(color: Colors.white54, fontSize: 13),
+              ),
+              trailing: const Icon(Icons.chevron_right, color: Colors.white54),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LseReferenceScreen(),
+                  ),
+                );
+              },
+            ),
           ]),
           const SizedBox(height: 24),
           _buildSection('LSE', [
             _ModeCard(
               title: 'EOLR',
-              subtitle: 'Edge Orientation + LR edges',
+              subtitle: l10n['eolrSubtitle'],
               icon: Icons.sync_alt,
               color: Colors.purple,
               mode: TrainingMode.lseEOLR,
@@ -109,7 +288,7 @@ class TrainingScreen extends StatelessWidget {
             ),
             _ModeCard(
               title: '4C',
-              subtitle: 'Last 4 corners (UL/UR edges)',
+              subtitle: l10n['fourCSubtitle'],
               icon: Icons.last_page,
               color: Colors.pink,
               mode: TrainingMode.lse4C,
@@ -142,7 +321,9 @@ class TrainingScreen extends StatelessWidget {
   Widget _buildCmllCategoryCard(
     BuildContext context,
     VoidCallback onModeSelected,
+    String locale,
   ) {
+    final l10n = AppLocalizations(locale);
     return Card(
       color: Colors.grey[900],
       margin: const EdgeInsets.only(bottom: 12),
@@ -156,18 +337,18 @@ class TrainingScreen extends StatelessWidget {
           ),
           child: const Icon(Icons.category, color: Colors.orange),
         ),
-        title: const Text(
-          'CMLL by Category',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        title: Text(
+          l10n['cmllByCategory'],
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
-        subtitle: const Text(
-          'Select specific CMLL categories',
-          style: TextStyle(color: Colors.white54, fontSize: 13),
+        subtitle: Text(
+          l10n['cmllByCategorySubtitle'],
+          style: const TextStyle(color: Colors.white54, fontSize: 13),
         ),
         children: getCmllCategories().map((cat) {
           return ListTile(
             title: Text(
-              '$cat (${getCmllByCategory(cat).length} cases)',
+              '$cat (${getCmllByCategory(cat).length} ${l10n['cases']})',
               style: const TextStyle(color: Colors.white70),
             ),
             trailing: IconButton(
@@ -177,7 +358,7 @@ class TrainingScreen extends StatelessWidget {
                 onModeSelected();
               },
             ),
-            onTap: () => _showCmllCases(context, cat, onModeSelected),
+            onTap: () => _showCmllCases(context, cat, onModeSelected, locale),
           );
         }).toList(),
       ),
@@ -188,7 +369,9 @@ class TrainingScreen extends StatelessWidget {
     BuildContext context,
     String category,
     VoidCallback onModeSelected,
+    String locale,
   ) {
+    final l10n = AppLocalizations(locale);
     final cases = getCmllByCategory(category);
     showModalBottomSheet(
       context: context,
@@ -204,7 +387,7 @@ class TrainingScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    '$category Cases',
+                    '$category ${l10n['cases']}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,

@@ -1,3 +1,5 @@
+import '../roux/cube.dart';
+
 // CMLL算法集
 // 移植自 roux-trainers/src/lib/Algs.tsx
 
@@ -308,4 +310,38 @@ CmllCase getRandomCmllCase({List<String>? categories}) {
   }
   filtered.shuffle();
   return filtered.first;
+}
+
+// 预计算每个 case 从 solved 应用后的 top corners 状态
+final Map<String, RouxCube> _cmllCaseEffects = {
+  for (final case_ in cmllAlgs)
+    case_.id: RouxCube.solved().applyAlg(case_.alg),
+};
+
+bool _topCornersMatch(RouxCube a, RouxCube b) {
+  for (int i = 0; i < 4; i++) {
+    if (a.cp[i] != b.cp[i] || a.co[i] != b.co[i]) return false;
+  }
+  return true;
+}
+
+/// 识别一个 CMLL 状态对应的标准 case（考虑 AUF）
+/// 如果 bottom corners 未解决，返回 null
+CmllCase? identifyCmllCase(RouxCube cube) {
+  // 检查 bottom corners (4,5,6,7) 是否 solved
+  for (int i = 4; i < 8; i++) {
+    if (cube.cp[i] != i || cube.co[i] != 0) return null;
+  }
+
+  const aufs = ['', 'U', "U'", 'U2'];
+  for (final auf in aufs) {
+    final testCube = cube.applyAlg(auf);
+    for (final case_ in cmllAlgs) {
+      final effect = _cmllCaseEffects[case_.id]!;
+      if (_topCornersMatch(effect, testCube)) {
+        return case_;
+      }
+    }
+  }
+  return null;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/timer_provider.dart';
 import '../models/solve_record.dart';
+import '../l10n/app_localizations.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -19,21 +20,8 @@ class HistoryScreen extends StatelessWidget {
     return '$seconds.${millis.toString().padLeft(3, '0')}';
   }
 
-  String _modeName(TrainingMode mode) {
-    switch (mode) {
-      case TrainingMode.standard:
-        return 'Standard';
-      case TrainingMode.cmll:
-        return 'CMLL';
-      case TrainingMode.fb:
-        return 'FB';
-      case TrainingMode.sb:
-        return 'SB';
-      case TrainingMode.lseEOLR:
-        return 'EOLR';
-      case TrainingMode.lse4C:
-        return '4C';
-    }
+  String _modeName(TrainingMode mode, String locale) {
+    return localizedModeLabel(mode, locale);
   }
 
   @override
@@ -43,9 +31,11 @@ class HistoryScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: const Text(
-          'Session History',
-          style: TextStyle(color: Colors.white),
+        title: Consumer<TimerProvider>(
+          builder: (context, timer, _) => Text(
+            AppLocalizations(timer.settings.locale)['sessionHistory'],
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
         actions: [
           IconButton(
@@ -59,12 +49,13 @@ class HistoryScreen extends StatelessWidget {
       body: Consumer<TimerProvider>(
         builder: (context, timer, child) {
           final records = timer.records;
+          final l10n = AppLocalizations(timer.settings.locale);
 
           if (records.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'No solves yet',
-                style: TextStyle(color: Colors.white54, fontSize: 18),
+                l10n['noSolvesYet'],
+                style: const TextStyle(color: Colors.white54, fontSize: 18),
               ),
             );
           }
@@ -87,18 +78,18 @@ class HistoryScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatBox('Current AO5', _formatDuration(avg5)),
-                        _buildStatBox('Current AO12', _formatDuration(avg12)),
-                        _buildStatBox('Current AO100', _formatDuration(avg100)),
+                        _buildStatBox(l10n['currentAo5'], _formatDuration(avg5)),
+                        _buildStatBox(l10n['currentAo12'], _formatDuration(avg12)),
+                        _buildStatBox(l10n['currentAo100'], _formatDuration(avg100)),
                       ],
                     ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatBox('Best', _formatDuration(best)),
-                        _buildStatBox('Best AO5', _formatDuration(bestAvg5)),
-                        _buildStatBox('Best AO12', _formatDuration(bestAvg12)),
+                        _buildStatBox(l10n['best'], _formatDuration(best)),
+                        _buildStatBox(l10n['bestAo5'], _formatDuration(bestAvg5)),
+                        _buildStatBox(l10n['bestAo12'], _formatDuration(bestAvg12)),
                       ],
                     ),
                   ],
@@ -149,9 +140,9 @@ class HistoryScreen extends StatelessWidget {
                               ),
                             ),
                             if (record.penalty == Penalty.plus2)
-                              const Text(
-                                ' +2',
-                                style: TextStyle(
+                              Text(
+                                ' ${l10n['penaltyPlus2']}',
+                                style: const TextStyle(
                                   color: Colors.orange,
                                   fontSize: 14,
                                 ),
@@ -162,7 +153,7 @@ class HistoryScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _modeName(record.mode),
+                              _modeName(record.mode, timer.settings.locale),
                               style: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 12,
@@ -195,25 +186,25 @@ class HistoryScreen extends StatelessWidget {
                             }
                           },
                           itemBuilder: (context) => [
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'ok',
                               child: Text(
-                                'OK',
-                                style: TextStyle(color: Colors.white),
+                                l10n['ok'],
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'plus2',
                               child: Text(
-                                '+2',
-                                style: TextStyle(color: Colors.orange),
+                                l10n['penaltyPlus2'],
+                                style: const TextStyle(color: Colors.orange),
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'dnf',
                               child: Text(
-                                'DNF',
-                                style: TextStyle(color: Colors.red),
+                                l10n['penaltyDNF'],
+                                style: const TextStyle(color: Colors.red),
                               ),
                             ),
                           ],
@@ -264,30 +255,29 @@ class HistoryScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
-        title: const Text(
-          'Clear Session?',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppLocalizations(context.read<TimerProvider>().settings.locale)['clearSession'],
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'This will delete all solves in the current session.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          AppLocalizations(context.read<TimerProvider>().settings.locale)['clearSessionConfirm'],
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white54),
+            child: Text(
+              AppLocalizations(context.read<TimerProvider>().settings.locale)['cancel'],
+              style: const TextStyle(color: Colors.white54),
             ),
           ),
           TextButton(
             onPressed: () {
-              // 清除所有成绩
               final timer = context.read<TimerProvider>();
               timer.clearRecords();
               Navigator.pop(context);
             },
-            child: const Text('Clear', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations(context.read<TimerProvider>().settings.locale)['clear'], style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
