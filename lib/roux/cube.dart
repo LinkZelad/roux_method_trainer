@@ -474,16 +474,20 @@ class RouxMove {
     final rws = _makeRotSet(rw);
     final lw = RouxMove.fromMoves([_baseL, _baseM], 'l');
     final lws = _makeRotSet(lw);
-    final uw = RouxMove.fromMoves([_baseU, _baseE], 'u');
+    final uw = RouxMove.fromMoves([_baseU, e[2]], 'u');
     final uws = _makeRotSet(uw);
+    final dw = RouxMove.fromMoves([_baseD, _baseE], 'd');
+    final dws = _makeRotSet(dw);
     final fw = RouxMove.fromMoves([_baseF, _baseS], 'f');
     final fws = _makeRotSet(fw);
+    final bw = RouxMove.fromMoves([_baseB, s[2]], 'b');
+    final bws = _makeRotSet(bw);
 
     final x = RouxMove.fromMoves([_baseR, l[2], m[2]], 'x');
     final xs = _makeRotSet(x);
-    final y = RouxMove.fromMoves([_baseU, _baseE, d[2]], 'y');
+    final y = RouxMove.fromMoves([_baseU, d[2], e[2]], 'y');
     final ys = _makeRotSet(y);
-    final z = RouxMove.fromMoves([x, y, x, x, x], 'z');
+    final z = RouxMove.fromMoves([_baseF, b[2], _baseS], 'z');
     final zs = _makeRotSet(z);
 
     final moves = [
@@ -503,7 +507,9 @@ class RouxMove {
       ...rws,
       ...lws,
       ...uws,
+      ...dws,
       ...fws,
+      ...bws,
     ];
 
     return {for (final move in moves) move.name: move};

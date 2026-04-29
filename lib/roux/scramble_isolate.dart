@@ -302,3 +302,50 @@ class IsolatePracticeRequest {
     solution: solutions.isNotEmpty ? solutions.first.toString() : null,
   );
 }
+
+({String scramble, String algorithm}) generateFullRouxSolve(int seed) {
+  final random = Random(seed);
+  final scrambleStr = _generateStandard(random);
+  var cube = RouxCube.solved().applyAlg(scrambleStr);
+  final fullAlg = <String>[];
+
+  // 1. Solve FB (L 1x2x3)
+  final fbSolver = RouxSolver.fb();
+  final fbSol = fbSolver.solve(cube, minDepth: 0, maxDepth: 12, capacity: 1);
+  if (fbSol.isEmpty) throw Exception("Failed to solve FB");
+  fullAlg.add("// FB\n${fbSol.first}");
+  cube = cube.apply(fbSol.first);
+
+  // 2. Solve DR Edge
+  final drSolver = RouxSolver.fbdr();
+  final drSol = drSolver.solve(cube, minDepth: 0, maxDepth: 12, capacity: 1);
+  if (drSol.isEmpty) throw Exception("Failed to solve DR");
+  fullAlg.add("// DR\n${drSol.first}");
+  cube = cube.apply(drSol.first);
+
+  // 3. Solve remaining SB (the two pairs)
+  final sbSolver = RouxSolver.sb();
+  final sbSol = sbSolver.solve(cube, minDepth: 0, maxDepth: 16, capacity: 1);
+  if (sbSol.isEmpty) throw Exception("Failed to solve SB");
+  fullAlg.add("// SB\n${sbSol.first}");
+  cube = cube.apply(sbSol.first);
+
+  // 4. Solve CMLL
+  final cmllSolver = RouxSolver.cmll();
+  final cmllSol = cmllSolver.solve(cube, minDepth: 0, maxDepth: 13, capacity: 1);
+  if (cmllSol.isEmpty) throw Exception("Failed to solve CMLL");
+  fullAlg.add("// CMLL\n${cmllSol.first}");
+  cube = cube.apply(cmllSol.first);
+
+  // 5. Solve LSE
+  final lseSolver = RouxSolver.lse();
+  final lseSol = lseSolver.solve(cube, minDepth: 0, maxDepth: 16, capacity: 1);
+  if (lseSol.isEmpty) throw Exception("Failed to solve LSE");
+  fullAlg.add("// LSE\n${lseSol.first}");
+
+  return (
+    scramble: scrambleStr,
+    algorithm: fullAlg.join('\n\n'),
+  );
+}
+

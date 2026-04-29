@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_settings.dart';
 import '../models/cmll_algs.dart';
+import '../models/fb_sb_algs.dart';
 import '../providers/timer_provider.dart';
 import '../roux/cube.dart';
 import '../widgets/cube_3d.dart';
 import 'demo_screen.dart';
 
 /// Teaching mode screen: browse Roux formulas with 3D cube visualization.
-/// Currently focuses on CMLL cases (the main formula-based step in Roux).
+/// Supports FB, SB, and CMLL steps.
 class TeachingScreen extends StatefulWidget {
   const TeachingScreen({super.key});
 
@@ -17,13 +18,20 @@ class TeachingScreen extends StatefulWidget {
 }
 
 class _TeachingScreenState extends State<TeachingScreen> {
+  String _currentStep = 'CMLL'; // 'FB', 'SB', or 'CMLL'
   String? _selectedCategory;
-  CmllCase? _selectedCase;
+  dynamic _selectedCase; // Can be CmllCase or RouxTeachingCase
 
   @override
   Widget build(BuildContext context) {
-    final categories = getCmllCategories();
     final colorScheme = context.watch<TimerProvider>().settings.colorScheme;
+    
+    List<String> categories;
+    if (_currentStep == 'CMLL') {
+      categories = getCmllCategories();
+    } else {
+      categories = getSubCategoriesByStep(_currentStep);
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -34,12 +42,48 @@ class _TeachingScreenState extends State<TeachingScreen> {
           'Teaching Mode',
           style: TextStyle(color: Colors.white),
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: ['FB', 'SB', 'CMLL'].map((step) {
+                final isSelected = _currentStep == step;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _currentStep = step;
+                      _selectedCategory = null;
+                      _selectedCase = null;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.orange : Colors.grey[900],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      step,
+                      style: TextStyle(
+                        color: isSelected ? Colors.black : Colors.white70,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
       ),
       body: Row(
         children: [
           // Left sidebar: category list
           SizedBox(
-            width: 80,
+            width: 90,
             child: ListView.builder(
               itemCount: categories.length,
               itemBuilder: (context, index) {
@@ -60,7 +104,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? Colors.orange
+                          ? Colors.orange.withValues(alpha: 0.8)
                           : Colors.grey[900],
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -69,7 +113,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: isSelected ? Colors.black : Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -118,16 +162,28 @@ class _TeachingScreenState extends State<TeachingScreen> {
   }
 
   Widget _buildCaseList(String category, CubeColorScheme colorScheme) {
-    final cases = getCmllByCategory(category);
+    List<dynamic> cases;
+    if (_currentStep == 'CMLL') {
+      cases = getCmllByCategory(category);
+    } else {
+      cases = getTeachingCasesByStep(_currentStep)
+          .where((c) => c.subCategory == category)
+          .toList();
+    }
+
     return ListView.builder(
       itemCount: cases.length,
       itemBuilder: (context, index) {
         final case_ = cases[index];
-        final isSelected = _selectedCase?.id == case_.id;
+        final id = _currentStep == 'CMLL' ? (case_ as CmllCase).id : (case_ as RouxTeachingCase).id;
+        final name = _currentStep == 'CMLL' ? (case_ as CmllCase).name : (case_ as RouxTeachingCase).name;
+        final isSelected = (_currentStep == 'CMLL' && _selectedCase is CmllCase && _selectedCase.id == id) ||
+                           (_currentStep != 'CMLL' && _selectedCase is RouxTeachingCase && _selectedCase.id == id);
+        
         return ListTile(
           dense: true,
           title: Text(
-            case_.name,
+            name,
             style: TextStyle(
               color: isSelected ? Colors.orange : Colors.white70,
               fontSize: 13,
@@ -141,10 +197,15 @@ class _TeachingScreenState extends State<TeachingScreen> {
     );
   }
 
-  Widget _buildCaseDetail(CmllCase case_, CubeColorScheme colorScheme) {
-    // Generate a scramble that produces this CMLL case.
-    // The scramble is the inverse of the algorithm.
-    final scramble = RouxMoveSeq.parse(case_.alg).inverse().toString();
+  Widget _buildCaseDetail(dynamic case_, CubeColorScheme colorScheme) {
+    final String name = _currentStep == 'CMLL' ? (case_ as CmllCase).name : (case_ as RouxTeachingCase).name;
+    final String category = _currentStep == 'CMLL' ? (case_ as CmllCase).category : (case_ as RouxTeachingCase).subCategory;
+    final String id = _currentStep == 'CMLL' ? (case_ as CmllCase).id : (case_ as RouxTeachingCase).id;
+    final String alg = _currentStep == 'CMLL' ? (case_ as CmllCase).alg : (case_ as RouxTeachingCase).alg;
+    final String scramble = _currentStep == 'CMLL' 
+        ? RouxMoveSeq.parse(alg).inverse().toString()
+        : (case_ as RouxTeachingCase).scramble;
+    
     final caseCube = RouxCube.solved().applyAlg(scramble);
 
     return SingleChildScrollView(
@@ -154,7 +215,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
         children: [
           // Case name
           Text(
-            '${case_.category} - ${case_.name}',
+            '$category - $name',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -163,7 +224,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            case_.id,
+            id,
             style: const TextStyle(color: Colors.white38, fontSize: 12),
           ),
           const SizedBox(height: 24),
@@ -199,7 +260,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
             child: Column(
               children: [
                 const Text(
-                  'Algorithm',
+                  'Algorithm / Solution',
                   style: TextStyle(
                     color: Colors.orange,
                     fontSize: 12,
@@ -209,7 +270,7 @@ class _TeachingScreenState extends State<TeachingScreen> {
                 ),
                 const SizedBox(height: 12),
                 SelectableText(
-                  case_.alg,
+                  alg,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
@@ -230,9 +291,9 @@ class _TeachingScreenState extends State<TeachingScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => DemoScreen(
-                    title: '${case_.category} - ${case_.name}',
+                    title: '$category - $name',
                     scramble: scramble,
-                    algorithm: case_.alg,
+                    algorithm: alg,
                   ),
                 ),
               );
@@ -254,3 +315,4 @@ class _TeachingScreenState extends State<TeachingScreen> {
     );
   }
 }
+

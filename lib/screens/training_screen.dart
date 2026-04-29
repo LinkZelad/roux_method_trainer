@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/timer_provider.dart';
 import '../models/solve_record.dart';
 import '../models/cmll_algs.dart';
+import '../roux/scramble_isolate.dart';
+import '../roux/solver.dart';
+import '../roux/cube.dart';
 import 'cmll_reference_screen.dart';
 import 'demo_screen.dart';
 import 'lse_reference_screen.dart';
@@ -14,6 +18,53 @@ class TrainingScreen extends StatelessWidget {
   final VoidCallback onModeSelected;
 
   const TrainingScreen({super.key, required this.onModeSelected});
+
+  Future<void> _startFullSolveDemo(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Generating full solve...'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final result = await compute(generateFullRouxSolve, DateTime.now().millisecondsSinceEpoch);
+      
+      if (context.mounted) {
+        Navigator.pop(context); // Remove loading dialog
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DemoScreen(
+              title: 'Full Roux Solve',
+              scramble: result.scramble,
+              algorithm: result.algorithm,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate solve: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +206,38 @@ class TrainingScreen extends StatelessWidget {
                 },
               ),
             ),
+            Card(
+              color: Colors.grey[900],
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.model_training, color: Colors.redAccent),
+                ),
+                title: const Text(
+                  'Full Roux Solve Demo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Watch a complete end-to-end Roux solve',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white54,
+                ),
+                onTap: () => _startFullSolveDemo(context),
+              ),
+            ),
+
           ]),
           const SizedBox(height: 24),
           _buildSection(l10n['timerModes'], [

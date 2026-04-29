@@ -16,7 +16,7 @@ class RouxSolver {
     required this.isSolved,
     required List<String> moveset,
     List<RouxPruner> pruners = const [],
-    this.maxStateCount = 3000000,
+    this.maxStateCount = 5000000,
   }) : moveset = List.unmodifiable(moveset.map((name) => RouxMove.all[name]!)),
        pruners = List.unmodifiable(pruners);
 
@@ -61,12 +61,11 @@ class RouxSolver {
     return RouxSolver(
       isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.sb),
       moveset: const [
-        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
-        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
-        'M', "M'", 'M2',
+        'U', "U'", 'U2', 'R', "R'", 'R2',
+        'M', "M'", 'M2', 'r', "r'", 'r2',
       ],
       pruners: [sbCorner, sbEdgeA, sbEdgeB],
-      maxStateCount: 100000,
+      maxStateCount: 2000000,
     );
   }
 
@@ -86,12 +85,11 @@ class RouxSolver {
     return RouxSolver(
       isSolved: (cube) => RouxCubeUtil.isSolved(cube, RouxCubeMask.fbdr),
       moveset: const [
-        'U', "U'", 'U2', 'D', "D'", 'D2', 'F', "F'", 'F2',
-        'B', "B'", 'B2', 'R', "R'", 'R2', 'L', "L'", 'L2',
-        'M', "M'", 'M2',
+        'U', "U'", 'U2', 'R', "R'", 'R2',
+        'M', "M'", 'M2', 'r', "r'", 'r2',
       ],
       pruners: [fbCorner, fbEdge, drEdge],
-      maxStateCount: 100000,
+      maxStateCount: 2000000,
     );
   }
 
@@ -106,7 +104,7 @@ class RouxSolver {
         'M', "M'", 'M2',
       ],
       pruners: [fsCorner, fsEdge],
-      maxStateCount: 100000,
+      maxStateCount: 2000000,
     );
   }
 

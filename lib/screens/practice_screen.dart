@@ -208,16 +208,28 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     ),
                     const SizedBox(height: 16),
                     if (_showSolution)
-                      Text(
-                        _recommendedSolution!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'RobotoMono',
-                          height: 1.5,
-                        ),
+                      Column(
+                        children: [
+                          Text(
+                            _recommendedSolution!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'RobotoMono',
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '(${_recommendedSolution!.split(' ').length} moves)',
+                            style: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       )
                     else
                       GestureDetector(

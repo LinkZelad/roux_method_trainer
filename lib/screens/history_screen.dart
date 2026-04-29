@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/timer_provider.dart';
 import '../models/solve_record.dart';
 import '../l10n/app_localizations.dart';
+import 'stats_analysis_screen.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -38,6 +39,15 @@ class HistoryScreen extends StatelessWidget {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined, color: Colors.white70),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StatsAnalysisScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline, color: Colors.white70),
             onPressed: () {
