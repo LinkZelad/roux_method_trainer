@@ -23,6 +23,7 @@ class RouxTeachingCase {
 
 /// FB teaching cases
 final List<RouxTeachingCase> fbTeachingCases = [
+  // Line (DL Edge)
   RouxTeachingCase(
     id: 'fb_line_u',
     name: 'DL Edge in U',
@@ -40,6 +41,16 @@ final List<RouxTeachingCase> fbTeachingCases = [
     subCategory: 'Line',
   ),
   RouxTeachingCase(
+    id: 'fb_line_back',
+    name: 'DL Edge in Back',
+    alg: "B L'",
+    setup: "L B'",
+    category: 'FB',
+    subCategory: 'Line',
+  ),
+  
+  // Pairs
+  RouxTeachingCase(
     id: 'fb_pair1_basic',
     name: 'Basic Front Pair',
     alg: "U R U' L'",
@@ -56,6 +67,14 @@ final List<RouxTeachingCase> fbTeachingCases = [
     subCategory: 'Pairs',
   ),
   RouxTeachingCase(
+    id: 'fb_pair1_misaligned',
+    name: 'Front Pair Misaligned',
+    alg: "U F' L F",
+    setup: "F' L' F U'",
+    category: 'FB',
+    subCategory: 'Pairs',
+  ),
+  RouxTeachingCase(
     id: 'fb_pair2_basic',
     name: 'Basic Back Pair',
     alg: "U' R' U L",
@@ -63,10 +82,28 @@ final List<RouxTeachingCase> fbTeachingCases = [
     category: 'FB',
     subCategory: 'Pairs',
   ),
+  RouxTeachingCase(
+    id: 'fb_pair2_bottom',
+    name: 'Back Pair on Bottom',
+    alg: "D L' D' L",
+    setup: "L' D L D'",
+    category: 'FB',
+    subCategory: 'Pairs',
+  ),
+
+  // Advanced/Common FB
+  RouxTeachingCase(
+    id: 'fb_square_basic',
+    name: 'Basic Square (1x2x2)',
+    alg: "U2 r U' r'",
+    category: 'FB',
+    subCategory: 'Advanced',
+  ),
 ];
 
 /// SB teaching cases
 final List<RouxTeachingCase> sbTeachingCases = [
+  // DR Edge
   RouxTeachingCase(
     id: 'sb_dr_edge',
     name: 'DR Edge Setup',
@@ -82,6 +119,15 @@ final List<RouxTeachingCase> sbTeachingCases = [
     subCategory: 'DR',
   ),
   RouxTeachingCase(
+    id: 'sb_dr_misplaced',
+    name: 'DR Edge Misplaced',
+    alg: "M2 U R",
+    category: 'SB',
+    subCategory: 'DR',
+  ),
+
+  // Pairs
+  RouxTeachingCase(
     id: 'sb_pair1_basic',
     name: 'Basic Front Pair',
     alg: "U R U' R'",
@@ -92,6 +138,13 @@ final List<RouxTeachingCase> sbTeachingCases = [
     id: 'sb_pair1_split',
     name: 'Front Pair Split',
     alg: "U' R U2 R' U R U' R'",
+    category: 'SB',
+    subCategory: 'Pairs',
+  ),
+  RouxTeachingCase(
+    id: 'sb_pair1_flipped',
+    name: 'Front Pair Flipped',
+    alg: "R U R' U' F' U F",
     category: 'SB',
     subCategory: 'Pairs',
   ),
@@ -108,6 +161,22 @@ final List<RouxTeachingCase> sbTeachingCases = [
     alg: "R' U R U' R' U R",
     category: 'SB',
     subCategory: 'Pairs',
+  ),
+  RouxTeachingCase(
+    id: 'sb_pair2_edge_in_slot',
+    name: 'Edge in Slot (Pair 2)',
+    alg: "U' R' U' R U R' U' R",
+    category: 'SB',
+    subCategory: 'Pairs',
+  ),
+
+  // Advanced/Common SB
+  RouxTeachingCase(
+    id: 'sb_m_slice_pair',
+    name: 'M-Slice Pairing',
+    alg: "M' U R U' R' M",
+    category: 'SB',
+    subCategory: 'Advanced',
   ),
 ];
 
