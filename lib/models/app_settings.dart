@@ -24,7 +24,7 @@ class CubeColorScheme {
   List<Color> get colors => [u, d, f, b, r, l];
 
   static const standard = CubeColorScheme(
-    name: 'Standard',
+    name: 'Standard (White Top, Yellow Bottom)',
     u: Color(0xFFFFFFFF),
     d: Color(0xFFFFFF00),
     f: Color(0xFF00FF00),
@@ -34,23 +34,33 @@ class CubeColorScheme {
   );
 
   static const whiteBlueBridge = CubeColorScheme(
-    name: 'White base, Blue bridge',
+    name: 'White-Blue Bridge (Roux)',
     u: Color(0xFFFFFFFF),
     d: Color(0xFFFFFF00),
-    f: Color(0xFF00FF00),
+    f: Color(0xFFFF0000),
     b: Color(0xFFFFA500),
-    r: Color(0xFFFF0000),
-    l: Color(0xFF0000FF),
+    r: Color(0xFF0000FF),
+    l: Color(0xFF00FF00),
   );
 
   static const whiteRedBridge = CubeColorScheme(
-    name: 'White base, Red bridge',
+    name: 'White-Red Bridge (Roux)',
     u: Color(0xFFFFFFFF),
     d: Color(0xFFFFFF00),
-    f: Color(0xFF00FF00),
+    f: Color(0xFF0000FF),
+    b: Color(0xFF00FF00),
+    r: Color(0xFFFF0000),
+    l: Color(0xFFFFA500),
+  );
+
+  static const blueWhiteBridge = CubeColorScheme(
+    name: 'Blue Top, White Bottom',
+    u: Color(0xFF0000FF),
+    d: Color(0xFFFFFFFF),
+    f: Color(0xFFFF0000),
     b: Color(0xFFFFA500),
-    r: Color(0xFF0000FF),
-    l: Color(0xFFFF0000),
+    r: Color(0xFFFFFF00),
+    l: Color(0xFF00FF00),
   );
 
   static const japanese = CubeColorScheme(
@@ -63,7 +73,7 @@ class CubeColorScheme {
     l: Color(0xFFFFA500),
   );
 
-  static const all = [standard, whiteBlueBridge, whiteRedBridge, japanese];
+  static const all = [standard, whiteBlueBridge, whiteRedBridge, blueWhiteBridge, japanese];
 }
 
 class AppSettings {
