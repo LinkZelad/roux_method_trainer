@@ -135,6 +135,78 @@ class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStat
     _generateNewCase();
   }
 
+  Widget _buildTargetInfo() {
+    String title = '';
+    String description = '';
+    Color color = Colors.blue;
+
+    switch (_mode) {
+      case TrainingMode.fb:
+        title = 'First Block (Left Bridge)';
+        description = 'Build a 1x2x3 on the Left side.\nBottom: White, Left: Orange';
+        color = Colors.orange;
+        break;
+      case TrainingMode.sb:
+        title = 'Second Block (Right Bridge)';
+        description = 'Build a 1x2x3 on the Right side.\nBottom: White, Right: Red';
+        color = Colors.red;
+        break;
+      case TrainingMode.fbdr:
+        title = 'FB + DR Edge';
+        description = 'Build the Left Bridge and fix the DR edge.\nBottom: White, Front: Green';
+        color = Colors.green;
+        break;
+      case TrainingMode.fs:
+        title = 'First Square';
+        description = 'Build a 1x2x2 square on the Left.\nBottom: White, Left: Orange';
+        color = Colors.orangeAccent;
+        break;
+      case TrainingMode.cmll:
+        title = 'CMLL';
+        description = 'Solve the top 4 corners.\nBoth Bridges must be solved.';
+        color = Colors.purple;
+        break;
+      case TrainingMode.lseEOLR:
+      case TrainingMode.lse4C:
+        title = 'LSE';
+        description = 'Solve the remaining 6 edges.';
+        color = Colors.blue;
+        break;
+      default:
+        title = 'Standard Roux';
+        description = 'Solve the entire cube using Roux.';
+        color = Colors.blueGrey;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations(context.watch<TimerProvider>().settings.locale);
@@ -183,6 +255,50 @@ class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStat
             ),
             const SizedBox(height: 24),
             
+            // Scramble text at the top
+            if (!_isLoading)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      l10n['scramble'],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _scramble,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'RobotoMono',
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            const SizedBox(height: 16),
+            
+            // Bridge/Case Info
+            if (!_isLoading)
+              _buildTargetInfo(),
+
+            const SizedBox(height: 16),
+            
             // 3D Cube Display
             Container(
               height: 280,
@@ -206,19 +322,6 @@ class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStat
                     },
                   ),
             ),
-            
-            const SizedBox(height: 16),
-            // Scramble text
-            if (!_isLoading)
-              Text(
-                _scramble,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  fontFamily: 'RobotoMono',
-                ),
-              ),
 
             const SizedBox(height: 24),
             // Solution section
