@@ -8,8 +8,8 @@ import '../models/solve_record.dart';
 import '../providers/timer_provider.dart';
 import '../l10n/app_localizations.dart';
 import '../roux/scramble_isolate.dart';
-import '../widgets/cube_net.dart';
-import '../widgets/cube_net_highlight.dart';
+import '../roux/cube.dart';
+import '../widgets/cube_3d.dart';
 
 class PracticeScreen extends StatefulWidget {
   final TrainingMode initialMode;
@@ -20,19 +20,38 @@ class PracticeScreen extends StatefulWidget {
   State<PracticeScreen> createState() => _PracticeScreenState();
 }
 
-class _PracticeScreenState extends State<PracticeScreen> {
+class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStateMixin {
   late TrainingMode _mode;
   String _scramble = '';
   String? _recommendedSolution;
+  List<String> _solutionMoves = [];
+  int _currentSolutionStep = 0;
   bool _showSolution = false;
   bool _isLoading = false;
   final Random _random = Random();
+
+  late RouxCube _currentCube;
+  
+  late AnimationController _animController;
+  String? _animatingMove;
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
     _mode = widget.initialMode;
+    _currentCube = RouxCube.solved();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
     _generateNewCase();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
   }
 
   void _generateNewCase() {
@@ -40,6 +59,10 @@ class _PracticeScreenState extends State<PracticeScreen> {
       _isLoading = true;
       _showSolution = false;
       _recommendedSolution = null;
+      _solutionMoves = [];
+      _currentSolutionStep = 0;
+      _animatingMove = null;
+      _isAnimating = false;
     });
 
     final seed = _random.nextInt(1 << 31);
@@ -57,10 +80,49 @@ class _PracticeScreenState extends State<PracticeScreen> {
         setState(() {
           _scramble = result.scramble;
           _recommendedSolution = result.solution;
+          if (_recommendedSolution != null) {
+            _solutionMoves = RouxMoveSeq.parse(_recommendedSolution!).moves.map((m) => m.name).toList();
+          }
+          _currentCube = RouxCube.solved().applyAlg(_scramble);
           _isLoading = false;
         });
       }
     });
+  }
+
+  Future<void> _stepSolution(int direction) async {
+    if (_isAnimating || _recommendedSolution == null) return;
+    
+    if (direction > 0 && _currentSolutionStep < _solutionMoves.length) {
+      final move = _solutionMoves[_currentSolutionStep];
+      setState(() {
+        _animatingMove = move;
+        _isAnimating = true;
+      });
+      await _animController.forward(from: 0);
+      setState(() {
+        _currentCube = _currentCube.applyAlg(move);
+        _currentSolutionStep++;
+        _animatingMove = null;
+        _isAnimating = false;
+      });
+      _animController.reset();
+    } else if (direction < 0 && _currentSolutionStep > 0) {
+      final move = _solutionMoves[_currentSolutionStep - 1];
+      final inverseMove = RouxMoveSeq.parse(move).inverse().moves.first.name;
+      setState(() {
+        _animatingMove = inverseMove;
+        _isAnimating = true;
+      });
+      await _animController.forward(from: 0);
+      setState(() {
+        _currentCube = _currentCube.applyAlg(inverseMove);
+        _currentSolutionStep--;
+        _animatingMove = null;
+        _isAnimating = false;
+      });
+      _animController.reset();
+    }
   }
 
   String _modeLabel(TrainingMode mode) {
@@ -76,6 +138,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations(context.watch<TimerProvider>().settings.locale);
+    final colorScheme = context.watch<TimerProvider>().settings.colorScheme;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -118,72 +182,44 @@ class _PracticeScreenState extends State<PracticeScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            // Scramble display
+            
+            // 3D Cube Display
             Container(
+              height: 280,
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    l10n['scramble'],
-                    style: const TextStyle(
-                      color: Colors.white38,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
-                    ),
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator(color: Colors.green))
+                : AnimatedBuilder(
+                    animation: _animController,
+                    builder: (context, child) {
+                      return Cube3D.fromCube(
+                        _currentCube,
+                        colorScheme: colorScheme,
+                        size: 240,
+                        animatingMove: _animatingMove,
+                        animationProgress: _animController.value,
+                      );
+                    },
                   ),
-                  const SizedBox(height: 12),
-                  if (_isLoading)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.green,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          l10n['generating'],
-                          style: const TextStyle(color: Colors.white38, fontSize: 16),
-                        ),
-                      ],
-                    )
-                  else
-                    Text(
-                      _scramble,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        height: 1.5,
-                      ),
-                    ),
-                ],
-              ),
             ),
-            const SizedBox(height: 20),
-            // Cube net
-            if (!_isLoading && _scramble.isNotEmpty)
-              Consumer<TimerProvider>(
-                builder: (context, timer, child) {
-                  return CubeNet.fromScramble(
-                    _scramble,
-                    colorScheme: timer.settings.colorScheme,
-                    highlightMask: highlightMaskForMode(_mode),
-                    stickerSize: 26,
-                  );
-                },
+            
+            const SizedBox(height: 16),
+            // Scramble text
+            if (!_isLoading)
+              Text(
+                _scramble,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontFamily: 'RobotoMono',
+                ),
               ),
+
             const SizedBox(height: 24),
             // Solution section
             if (!_isLoading && _recommendedSolution != null)
@@ -223,11 +259,37 @@ class _PracticeScreenState extends State<PracticeScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '(${_recommendedSolution!.split(' ').length} moves)',
+                            'Step $_currentSolutionStep / ${_solutionMoves.length} (${_solutionMoves.length} moves)',
                             style: const TextStyle(
                               color: Colors.white38,
                               fontSize: 14,
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Step Controls
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white70),
+                                onPressed: _currentSolutionStep > 0 ? () => _stepSolution(-1) : null,
+                              ),
+                              const SizedBox(width: 20),
+                              IconButton(
+                                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white70),
+                                onPressed: _currentSolutionStep < _solutionMoves.length ? () => _stepSolution(1) : null,
+                              ),
+                              const SizedBox(width: 20),
+                              IconButton(
+                                icon: const Icon(Icons.refresh, color: Colors.white70),
+                                onPressed: () {
+                                  setState(() {
+                                    _currentCube = RouxCube.solved().applyAlg(_scramble);
+                                    _currentSolutionStep = 0;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       )
@@ -296,3 +358,4 @@ class _PracticeScreenState extends State<PracticeScreen> {
     );
   }
 }
+
