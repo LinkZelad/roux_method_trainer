@@ -23,8 +23,7 @@ String generateTimerScramble(IsolateTimerRequest req) {
     4 => _generateEolr(random),
     5 => _generateLse4c(random),
     6 => _generateFbdr(random),
-    7 => _generateFs(random),
-    8 => _generateDoubleBridge(random),
+    7 => _generateDoubleBridge(random),
     _ => "R U R'",
   };
   return scramble;
@@ -117,17 +116,6 @@ String _generateFbdr(Random random) {
   return scramble?.toString() ?? "R U R'";
 }
 
-String _generateFs(Random random) {
-  final solver = RouxSolver.fs();
-  final scramble = solver.generateScramble(
-    randomState: (r) => RouxCubeUtil.getRandomFs(random: r),
-    random: random,
-    maxDepth: 15,
-    maxAttempts: 30,
-  );
-  return scramble?.toString() ?? "R U R'";
-}
-
 String _generateDoubleBridge(Random random) {
   return _generateStandard(random);
 }
@@ -160,8 +148,7 @@ class IsolatePracticeRequest {
     4 => _practiceEolr(random),
     5 => _practiceLse4c(random),
     6 => _practiceFbdr(random),
-    7 => _practiceFs(random),
-    8 => _practiceDoubleBridge(random),
+    7 => _practiceDoubleBridge(random),
     _ => (scramble: "R U R'", solution: null),
   };
 }
@@ -191,13 +178,7 @@ class IsolatePracticeRequest {
 }
 
 ({String scramble, String? solution}) _practiceSb(Random random) {
-  const sbScrambleMask = RouxCubeMask(
-    cp: [0, 0, 0, 0, 1, 1, 0, 0],
-    ep: [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
-    tp: [1, 1, 1, 1, 1, 1],
-  );
-  
-  final cube = RouxCubeUtil.getRandomWithMask(sbScrambleMask, random: random);
+  final cube = RouxCubeUtil.getRandomSb(random: random);
   final scramble = RouxSolver.exact().scrambleFor(cube, maxDepth: 18);
   if (scramble == null) return (scramble: "R U R'", solution: null);
 
@@ -265,37 +246,13 @@ class IsolatePracticeRequest {
 }
 
 ({String scramble, String? solution}) _practiceFbdr(Random random) {
-  final solver = RouxSolver.fbdr();
-  final scramble = solver.generateScramble(
-    randomState: (r) => RouxCubeUtil.getRandomFbdr(random: r),
-    random: random,
-    maxDepth: 14,
-    maxAttempts: 50,
-  );
-  if (scramble == null) {
-    return (scramble: "R U R'", solution: null);
-  }
-  final cube = RouxCube.solved().apply(scramble);
-  final solutions = solver.solve(cube, minDepth: 0, maxDepth: 14, capacity: 1);
-  return (
-    scramble: scramble.toString(),
-    solution: solutions.isNotEmpty ? solutions.first.toString() : null,
-  );
-}
+  final cube = RouxCubeUtil.getRandomFbdr(random: random);
+  final scramble = RouxSolver.exact().scrambleFor(cube, maxDepth: 18);
+  if (scramble == null) return (scramble: "R U R'", solution: null);
 
-({String scramble, String? solution}) _practiceFs(Random random) {
-  final solver = RouxSolver.fs();
-  final scramble = solver.generateScramble(
-    randomState: (r) => RouxCubeUtil.getRandomFs(random: r),
-    random: random,
-    maxDepth: 18,
-    maxAttempts: 30,
-  );
-  if (scramble == null) {
-    return (scramble: "R U R'", solution: null);
-  }
-  final cube = RouxCube.solved().apply(scramble);
+  final solver = RouxSolver.fbdr();
   final solutions = solver.solve(cube, minDepth: 0, maxDepth: 12, capacity: 1);
+  
   return (
     scramble: scramble.toString(),
     solution: solutions.isNotEmpty ? solutions.first.toString() : null,
@@ -306,7 +263,6 @@ class IsolatePracticeRequest {
   final scrambleStr = _generateStandard(random);
   final cube = RouxCube.solved().applyAlg(scrambleStr);
   
-  // Solution is FB then SB
   final fbSolver = RouxSolver.fb();
   final sbSolver = RouxSolver.sb();
   
@@ -374,4 +330,3 @@ class IsolatePracticeRequest {
     algorithm: fullAlg.join('\n\n'),
   );
 }
-

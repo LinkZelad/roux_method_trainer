@@ -250,8 +250,8 @@ class RouxCubeUtil {
   static RouxCube getRandomSb({Random? random}) {
     random ??= Random();
     const sbScramble = RouxCubeMask(
-      cp: [1, 1, 1, 1, 1, 1, 0, 0],
-      ep: [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0],
+      cp: [0, 0, 0, 0, 1, 1, 0, 0],
+      ep: [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
       tp: [1, 1, 1, 1, 1, 1],
     );
     while (true) {
@@ -296,9 +296,9 @@ class RouxCubeUtil {
   static RouxCube getRandomFbdr({Random? random}) {
     random ??= Random();
     const fbdrScramble = RouxCubeMask(
-      cp: [1, 1, 1, 1, 0, 0, 1, 1],
-      ep: [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1],
-      tp: [1, 1, 1, 1, 0, 0],
+      cp: [0, 0, 0, 0, 1, 1, 0, 0],
+      ep: [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+      tp: [1, 1, 1, 1, 1, 1],
     );
     while (true) {
       final cube = getRandomWithMask(fbdrScramble, random: random);

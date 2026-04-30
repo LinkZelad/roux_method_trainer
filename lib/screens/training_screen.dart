@@ -253,14 +253,6 @@ class TrainingScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _buildSection(l10n['blockBuilding'], [
             _ModeCard(
-              title: l10n['firstSquareFs'],
-              subtitle: l10n['firstSquareSubtitle'],
-              icon: Icons.crop_square,
-              color: Colors.lightGreen,
-              mode: TrainingMode.fs,
-              onSelected: onModeSelected,
-            ),
-            _ModeCard(
               title: l10n['firstBlockFb'],
               subtitle: l10n['firstBlockSubtitle'],
               icon: Icons.view_column,
