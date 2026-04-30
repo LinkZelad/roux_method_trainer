@@ -237,11 +237,11 @@ class CubeNet extends StatelessWidget {
             height: size,
             margin: EdgeInsets.all(gap * 0.5),
             decoration: BoxDecoration(
-              color: isHighlighted ? color : color.withValues(alpha: 0.7),
+              color: isHighlighted ? color : color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(gap * 0.5),
               border: Border.all(
-                color: isHighlighted ? Colors.black : Colors.black45,
-                width: borderWidth,
+                color: isHighlighted ? Colors.white70 : Colors.black45,
+                width: isHighlighted ? borderWidth * 1.5 : borderWidth,
               ),
             ),
           );

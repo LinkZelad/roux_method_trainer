@@ -4,7 +4,7 @@ import 'dart:convert';
 
 enum Penalty { none, plus2, dnf }
 
-enum TrainingMode { standard, cmll, fb, sb, lseEOLR, lse4C, fbdr, fs }
+enum TrainingMode { standard, cmll, fb, sb, lseEOLR, lse4C, fbdr, fs, doubleBridge }
 
 class SolveRecord {
   final String id;

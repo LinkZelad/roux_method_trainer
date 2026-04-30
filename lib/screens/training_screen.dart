@@ -284,6 +284,14 @@ class TrainingScreen extends StatelessWidget {
               mode: TrainingMode.sb,
               onSelected: onModeSelected,
             ),
+            _ModeCard(
+              title: l10n['doubleBridge'],
+              subtitle: l10n['doubleBridgeSubtitle'],
+              icon: Icons.view_sidebar,
+              color: Colors.cyan,
+              mode: TrainingMode.doubleBridge,
+              onSelected: onModeSelected,
+            ),
           ]),
           const SizedBox(height: 24),
           _buildSection('CMLL', [

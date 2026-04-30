@@ -88,6 +88,8 @@ class AppLocalizations {
     'cmllReferenceSubtitle': 'View all CMLL algorithms',
     'eolrSubtitle': 'Edge Orientation + LR edges',
     'fourCSubtitle': 'Last 4 corners (UL/UR edges)',
+    'doubleBridge': 'Double Bridge (FB+SB)',
+    'doubleBridgeSubtitle': 'Build both Left and Right bridges',
     'noSolvesYet': 'No solves yet',
     'currentAo5': 'Current AO5',
     'currentAo12': 'Current AO12',
@@ -183,6 +185,8 @@ class AppLocalizations {
     'cmllReferenceSubtitle': '查看所有 CMLL 公式',
     'eolrSubtitle': '棱块定向 + LR 棱',
     'fourCSubtitle': '最后四角 (UL/UR 棱)',
+    'doubleBridge': '双桥 (FB+SB)',
+    'doubleBridgeSubtitle': '构建左右两桥',
     'noSolvesYet': '暂无还原',
     'currentAo5': '当前 AO5',
     'currentAo12': '当前 AO12',
@@ -221,5 +225,6 @@ String localizedModeLabel(TrainingMode mode, String locale) {
     TrainingMode.lse4C => l10n['fourC'],
     TrainingMode.fbdr => l10n['fbdr'],
     TrainingMode.fs => l10n['firstSquare'],
+    TrainingMode.doubleBridge => l10n['doubleBridge'],
   };
 }

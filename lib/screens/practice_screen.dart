@@ -161,6 +161,11 @@ class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStat
         description = 'Build a 1x2x2 square on the Left.\nBottom: White, Left: Orange';
         color = Colors.orangeAccent;
         break;
+      case TrainingMode.doubleBridge:
+        title = 'Double Bridge (FB + SB)';
+        description = 'Build both Left and Right bridges.\nBottom: White, Left: Orange, Right: Red';
+        color = Colors.cyan;
+        break;
       case TrainingMode.cmll:
         title = 'CMLL';
         description = 'Solve the top 4 corners.\nBoth Bridges must be solved.';

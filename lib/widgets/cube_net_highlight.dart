@@ -65,21 +65,21 @@ List<List<bool>> lseHighlightMask() {
 }
 
 /// Highlight mask for CMLL stage.
-/// Highlights the U-layer corners.
+/// Highlights the U-layer stickers and side corners.
 List<List<bool>> cmllHighlightMask() {
   return [
     // U: all U layer stickers
     [true, true, true, true, true, true, true, true, true],
     // D: no CMLL stickers
     [false, false, false, false, false, false, false, false, false],
-    // F: top edge (UF)
-    [false, true, false, false, false, false, false, false, false],
-    // B: top edge (UB)
-    [false, true, false, false, false, false, false, false, false],
-    // R: top edge (UR)
-    [false, true, false, false, false, false, false, false, false],
-    // L: top edge (UL)
-    [false, true, false, false, false, false, false, false, false],
+    // F: top corners
+    [true, false, true, false, false, false, false, false, false],
+    // B: top corners
+    [true, false, true, false, false, false, false, false, false],
+    // R: top corners
+    [true, false, true, false, false, false, false, false, false],
+    // L: top corners
+    [true, false, true, false, false, false, false, false, false],
   ];
 }
 

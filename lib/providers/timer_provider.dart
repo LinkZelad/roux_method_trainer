@@ -124,6 +124,7 @@ class TimerProvider extends ChangeNotifier {
       case TrainingMode.lse4C:
       case TrainingMode.fbdr:
       case TrainingMode.fs:
+      case TrainingMode.doubleBridge:
         final modeIndex = _mode.index;
         final seed = _rand.nextInt(1 << 31);
         compute(generateTimerScramble, IsolateTimerRequest(mode: modeIndex, seed: seed))

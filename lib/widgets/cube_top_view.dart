@@ -70,7 +70,7 @@ class CubeTopView extends StatelessWidget {
               (highlightMask!.length > faceIdx &&
                   highlightMask![faceIdx].length > stickerIdx &&
                   highlightMask![faceIdx][stickerIdx]);
-          return isHighlighted ? baseColor : baseColor.withValues(alpha: 0.7);
+          return isHighlighted ? baseColor : baseColor.withValues(alpha: 0.15);
         }
 
         BorderSide getBorder(int faceIdx, int stickerIdx) {
@@ -79,8 +79,8 @@ class CubeTopView extends StatelessWidget {
                   highlightMask![faceIdx].length > stickerIdx &&
                   highlightMask![faceIdx][stickerIdx]);
           return BorderSide(
-            color: isHighlighted ? Colors.black : Colors.black45,
-            width: borderWidth,
+            color: isHighlighted ? Colors.white70 : Colors.black45,
+            width: isHighlighted ? borderWidth * 1.5 : borderWidth,
           );
         }
 
