@@ -180,37 +180,30 @@ class IsolatePracticeRequest {
 }
 
 ({String scramble, String? solution}) _practiceFb(Random random) {
-  final solver = RouxSolver.fb();
-  final scramble = solver.generateScramble(
-    randomState: (r) => RouxCubeUtil.getRandomFb(random: r),
-    random: random,
-    maxDepth: 18,
-    maxAttempts: 30,
-  );
-  if (scramble == null) {
-    return (scramble: "R U R'", solution: null);
-  }
-  final cube = RouxCube.solved().apply(scramble);
-  final solutions = solver.solve(cube, minDepth: 0, maxDepth: 15, capacity: 1);
+  final scrambleStr = _generateStandard(random);
+  final cube = RouxCube.solved().applyAlg(scrambleStr);
+  final fbSolver = RouxSolver.fb();
+  final solutions = fbSolver.solve(cube, minDepth: 0, maxDepth: 12, capacity: 1);
   return (
-    scramble: scramble.toString(),
+    scramble: scrambleStr,
     solution: solutions.isNotEmpty ? solutions.first.toString() : null,
   );
 }
 
 ({String scramble, String? solution}) _practiceSb(Random random) {
-  final solver = RouxSolver.sb();
-  final scramble = solver.generateScramble(
-    randomState: (r) => RouxCubeUtil.getRandomSb(random: r),
-    random: random,
-    maxDepth: 18,
-    maxAttempts: 50,
+  const sbScrambleMask = RouxCubeMask(
+    cp: [0, 0, 0, 0, 1, 1, 0, 0],
+    ep: [0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
+    tp: [1, 1, 1, 1, 1, 1],
   );
-  if (scramble == null) {
-    return (scramble: "R U R'", solution: null);
-  }
-  final cube = RouxCube.solved().apply(scramble);
-  final solutions = solver.solve(cube, minDepth: 0, maxDepth: 14, capacity: 1);
+  
+  final cube = RouxCubeUtil.getRandomWithMask(sbScrambleMask, random: random);
+  final scramble = RouxSolver.exact().scrambleFor(cube, maxDepth: 18);
+  if (scramble == null) return (scramble: "R U R'", solution: null);
+
+  final sbSolver = RouxSolver.sb();
+  final solutions = sbSolver.solve(cube, minDepth: 0, maxDepth: 16, capacity: 1);
+  
   return (
     scramble: scramble.toString(),
     solution: solutions.isNotEmpty ? solutions.first.toString() : null,
