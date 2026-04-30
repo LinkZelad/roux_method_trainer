@@ -151,16 +151,6 @@ class _PracticeScreenState extends State<PracticeScreen> with TickerProviderStat
         description = 'Build a 1x2x3 on the Right side.\nBottom: White, Right: Red';
         color = Colors.red;
         break;
-      case TrainingMode.fbdr:
-        title = 'FB + DR Edge';
-        description = 'Build the Left Bridge and fix the DR edge.\nBottom: White, Front: Green';
-        color = Colors.green;
-        break;
-      case TrainingMode.fs:
-        title = 'First Square';
-        description = 'Build a 1x2x2 square on the Left.\nBottom: White, Left: Orange';
-        color = Colors.orangeAccent;
-        break;
       case TrainingMode.doubleBridge:
         title = 'Double Bridge (FB + SB)';
         description = 'Build both Left and Right bridges.\nBottom: White, Left: Orange, Right: Red';

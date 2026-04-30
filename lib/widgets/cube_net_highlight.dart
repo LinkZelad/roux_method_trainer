@@ -91,29 +91,6 @@ List<List<bool>> eolrHighlightMask() => lseHighlightMask();
 /// Same as LSE.
 List<List<bool>> lse4cHighlightMask() => lseHighlightMask();
 
-/// Highlight mask for FB+DR stage.
-/// Highlights FB block + DR edge.
-List<List<bool>> fbdrHighlightMask() => fbHighlightMask();
-
-/// Highlight mask for FS stage.
-/// Highlights the 2x2x1 square (DFL, DL, FL, L center).
-List<List<bool>> fsHighlightMask() {
-  return [
-    // U: no FS stickers
-    [false, false, false, false, false, false, false, false, false],
-    // D: bottom-left (DFL)
-    [true, false, false, false, false, false, false, false, false],
-    // F: bottom-left (DFL)
-    [false, false, false, false, false, false, true, false, false],
-    // B: no FS stickers
-    [false, false, false, false, false, false, false, false, false],
-    // R: no FS stickers
-    [false, false, false, false, false, false, false, false, false],
-    // L: left column + center (FL, L center, DFL)
-    [true, true, true, true, true, true, true, true, true],
-  ];
-}
-
 /// Returns the appropriate highlight mask for a training mode.
 List<List<bool>>? highlightMaskForMode(TrainingMode mode) {
   return switch (mode) {
@@ -122,8 +99,6 @@ List<List<bool>>? highlightMaskForMode(TrainingMode mode) {
     TrainingMode.cmll => cmllHighlightMask(),
     TrainingMode.lseEOLR => eolrHighlightMask(),
     TrainingMode.lse4C => lse4cHighlightMask(),
-    TrainingMode.fbdr => fbdrHighlightMask(),
-    TrainingMode.fs => fsHighlightMask(),
     _ => null,
   };
 }

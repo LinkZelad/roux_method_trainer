@@ -122,8 +122,6 @@ class TimerProvider extends ChangeNotifier {
       case TrainingMode.sb:
       case TrainingMode.lseEOLR:
       case TrainingMode.lse4C:
-      case TrainingMode.fbdr:
-      case TrainingMode.fs:
       case TrainingMode.doubleBridge:
         final modeIndex = _mode.index;
         final seed = _rand.nextInt(1 << 31);

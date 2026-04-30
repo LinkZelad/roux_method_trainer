@@ -223,8 +223,6 @@ String localizedModeLabel(TrainingMode mode, String locale) {
     TrainingMode.sb => l10n['secondBlock'],
     TrainingMode.lseEOLR => l10n['eolr'],
     TrainingMode.lse4C => l10n['fourC'],
-    TrainingMode.fbdr => l10n['fbdr'],
-    TrainingMode.fs => l10n['firstSquare'],
     TrainingMode.doubleBridge => l10n['doubleBridge'],
   };
 }

@@ -261,14 +261,6 @@ class TrainingScreen extends StatelessWidget {
               onSelected: onModeSelected,
             ),
             _ModeCard(
-              title: l10n['fbdrTitle'],
-              subtitle: l10n['fbdrSubtitle'],
-              icon: Icons.view_column,
-              color: Colors.greenAccent,
-              mode: TrainingMode.fbdr,
-              onSelected: onModeSelected,
-            ),
-            _ModeCard(
               title: l10n['secondBlockSb'],
               subtitle: l10n['secondBlockSubtitle'],
               icon: Icons.view_column_outlined,
